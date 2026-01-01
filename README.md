@@ -82,26 +82,8 @@ Follow these steps to set up the project locally.
 
 ---
 
-## 📸 Screenshots
 
-*(Add screenshots of your Dashboard, Login Page, and Admin Panel here)*
 
----
-
-## 🔮 Future Roadmap
-
-*   [ ] Email notifications for booking confirmations.
-*   [ ] User profile pictures and stats history.
-*   [ ] QR code check-in for machines.
-*   [ ] Payment integration for premium bookings.
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please fork the repository and create a pull request.
-
----
 
 ## 📄 License
 
