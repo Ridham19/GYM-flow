@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../store/authUser";
-import { Loader } from "lucide-react";
+import { Loader, Eye, EyeOff } from "lucide-react";
 
 const SignUpPage = () => {
 	const [formData, setFormData] = useState({ email: "", username: "", password: "" });
+	const [showPassword, setShowPassword] = useState(false);
 	const { signup, isSigningUp } = useAuthStore();
 
 	const handleSignUp = (e) => {
@@ -13,47 +14,64 @@ const SignUpPage = () => {
 	};
 
 	return (
-		<div className='min-h-screen flex items-center justify-center bg-gray-900 text-white'>
-			<div className='max-w-md w-full p-8 bg-gray-800 rounded-lg shadow-xl'>
-				<h2 className='text-3xl font-bold text-center mb-6'>Join the Gym</h2>
-				<form onSubmit={handleSignUp} className='space-y-4'>
-					<div>
-						<label className='block text-sm font-medium'>Username</label>
+		<div className='min-h-screen flex items-center justify-center p-6 relative overflow-hidden'>
+			<div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-secondary/10 pointer-events-none" />
+
+			<div className='max-w-md w-full glass-panel p-10 rounded-[2rem] relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700'>
+				<h2 className='text-3xl font-black text-center mb-2 tracking-tight'>Join GymFlow</h2>
+				<p className="text-muted-foreground text-center mb-8 font-medium">Start your fitness journey today</p>
+
+				<form onSubmit={handleSignUp} className='space-y-5'>
+					<div className="space-y-2">
+						<label className='text-xs font-bold text-muted-foreground uppercase tracking-widest ml-1'>Username</label>
 						<input
 							type='text'
-							className='w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500'
+							className='w-full px-4 py-3 rounded-xl bg-secondary/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none placeholder:text-muted-foreground/50'
+							placeholder="johndoe"
 							value={formData.username}
 							onChange={(e) => setFormData({ ...formData, username: e.target.value })}
 						/>
 					</div>
-					<div>
-						<label className='block text-sm font-medium'>Email</label>
+					<div className="space-y-2">
+						<label className='text-xs font-bold text-muted-foreground uppercase tracking-widest ml-1'>Email</label>
 						<input
 							type='email'
-							className='w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500'
+							className='w-full px-4 py-3 rounded-xl bg-secondary/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none placeholder:text-muted-foreground/50'
+							placeholder="name@email.com"
 							value={formData.email}
 							onChange={(e) => setFormData({ ...formData, email: e.target.value })}
 						/>
 					</div>
-					<div>
-						<label className='block text-sm font-medium'>Password</label>
-						<input
-							type='password'
-							className='w-full p-2 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500'
-							value={formData.password}
-							onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-						/>
+					<div className="space-y-2">
+						<label className='text-xs font-bold text-muted-foreground uppercase tracking-widest ml-1'>Password</label>
+						<div className="relative">
+							<input
+								type={showPassword ? 'text' : 'password'}
+								className='w-full px-4 py-3 rounded-xl bg-secondary/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none placeholder:text-muted-foreground/50 pr-12'
+								placeholder="••••••••"
+								value={formData.password}
+								onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+							/>
+							<button
+								type="button"
+								onClick={() => setShowPassword(!showPassword)}
+								className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+							>
+								{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+							</button>
+						</div>
 					</div>
+
 					<button
 						type='submit'
-						className='w-full py-2 bg-red-600 hover:bg-red-700 rounded font-semibold flex justify-center items-center'
+						className='w-full py-4 mt-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl font-bold uppercase tracking-widest shadow-lg shadow-primary/25 transition-all active:scale-[0.98] disabled:opacity-70 flex justify-center items-center'
 						disabled={isSigningUp}
 					>
-						{isSigningUp ? <Loader className='animate-spin' size={20} /> : "Sign Up"}
+						{isSigningUp ? <Loader className='animate-spin' size={20} /> : "Create Account"}
 					</button>
 				</form>
-				<p className='mt-4 text-center text-gray-400'>
-					Already a member? <Link to='/login' className='text-red-500 hover:underline'>Login</Link>
+				<p className='mt-8 text-center text-muted-foreground font-medium'>
+					Already a member? <Link to='/login' className='text-primary hover:underline font-bold'>Login</Link>
 				</p>
 			</div>
 		</div>

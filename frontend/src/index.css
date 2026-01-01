@@ -3,20 +3,88 @@
 @tailwind utilities;
 
 :root {
-  background-color: #0b0f1a; /* Deep Space Black */
-  color-scheme: dark;
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 217.2 91.2% 59.8%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 212.7 26.8% 83.9%;
 }
 
 body {
-  margin: 0;
-  font-family: 'Inter', sans-serif;
-  -webkit-font-smoothing: antialiased;
+  @apply bg-background text-foreground antialiased;
+  font-feature-settings: "rlig" 1, "calt" 1;
+  background: radial-gradient(circle at 50% 10%, #1a1f35 0%, #0b0f1a 100%),
+    url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop') center/cover no-repeat fixed;
+  background-blend-mode: overlay;
+  min-height: 100vh;
 }
 
-/* Custom Glass Effect */
-.glass {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+/* Liquid Glass Effect */
+.glass-panel {
+  @apply bg-white/5 backdrop-blur-2xl border border-white/10;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.liquid-bg-shape {
+  @apply absolute rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob;
+}
+
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+.animate-blob {
+  animation: blob 10s infinite;
+}
+
+.font-digital {
+  font-family: 'Orbitron', monospace;
+  letter-spacing: 0.1em;
+}
+
+.text-glow {
+  text-shadow: 0 0 10px currentColor;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-600;
 }
