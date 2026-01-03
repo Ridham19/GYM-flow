@@ -6,6 +6,7 @@ export const useAuthStore = create((set) => ({
 	user: null,
 	isSigningUp: false,
 	isLoggingIn: false,
+	isCheckingAuth: true,
 
 	signup: async (credentials) => {
 		set({ isSigningUp: true });
@@ -38,6 +39,17 @@ export const useAuthStore = create((set) => ({
 			toast.success("Logged out successfully");
 		} catch (error) {
 			toast.error(error.response.data.message || "Logout failed");
+		}
+	},
+
+	authCheck: async () => {
+		set({ isCheckingAuth: true });
+		try {
+			const response = await axios.get("/api/v1/auth/authCheck");
+			set({ user: response.data.user, isCheckingAuth: false });
+		} catch (error) {
+			set({ isCheckingAuth: false, user: null });
+			// Do not toast error here as it's a silent check
 		}
 	},
 }));

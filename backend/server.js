@@ -4,6 +4,7 @@ import { ENV_VARS } from "./config/envVars.js";
 import { connectDB } from "./config/db.js";
 import authRoutes from "./routes/auth.route.js";
 import gymRoutes from "./routes/gym.route.js";
+import trainerRoutes from "./routes/trainer.route.js";
 import path from "path";
 
 
@@ -13,12 +14,13 @@ const PORT = ENV_VARS.PORT;
 app.use(express.json()); // allows us to parse req.body
 app.use(cookieParser());
 app.use("/api/v1/gym", gymRoutes);
+app.use("/api/v1/trainers", trainerRoutes);
 
 app.use("/api/v1/auth", authRoutes);
 
 app.listen(PORT, () => {
-	console.log("Server started at http://localhost:" + PORT);
-	connectDB();
+    console.log("Server started at http://localhost:" + PORT);
+    connectDB();
 });
 
 
@@ -39,13 +41,13 @@ const seedMachines = async () => {
 const __dirname = path.resolve();
 
 if (ENV_VARS.NODE_ENV === "production") {
-	// Serve the static files from the frontend/dist folder
-	app.use(express.static(path.join(__dirname, "/frontend/dist")));
+    // Serve the static files from the frontend/dist folder
+    app.use(express.static(path.join(__dirname, "/frontend/dist")));
 
-	// For any other route, serve the index.html file
-	app.get("*", (req, res) => {
-		res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
-	});
+    // For any other route, serve the index.html file
+    app.get("*", (req, res) => {
+        res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+    });
 } else {
     // Basic route for development if you hit port 5000 directly
     app.get("/", (req, res) => {

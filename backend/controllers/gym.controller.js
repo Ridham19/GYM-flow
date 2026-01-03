@@ -1,5 +1,6 @@
 import { Machine } from "../models/machine.model.js";
 import { Booking } from "../models/booking.model.js";
+import { Trainer } from "../models/trainer.model.js";
 
 export async function getMachines(req, res) {
 	try {
@@ -12,11 +13,36 @@ export async function getMachines(req, res) {
 
 export async function createReservation(req, res) {
 	try {
-		const { machineId, startTime, endTime } = req.body;
+		// Changed to trainerIds array
+		const { trainerIds, startTime, endTime } = req.body;
 
-		// 1. Conflict Check
+		if (!trainerIds || trainerIds.length === 0) {
+			return res.status(400).json({ success: false, message: "Select at least one trainer" });
+		}
+
+		const start = new Date(startTime);
+		const end = new Date(endTime);
+		const startHour = start.getHours();
+
+		// 1. Validate Working Hours for ALL selected trainers
+		// We need to fetch trainers first to check their specific working hours
+		// For simplicity/performance, assume we might need to do a DB call here or just check basic range constraint if generic.
+		// But user requirement: "time user selects should be in the trainers working hour"
+		// Detailed check:
+		const trainers = await Trainer.find({ _id: { $in: trainerIds } });
+
+		for (const trainer of trainers) {
+			const tStart = parseInt(trainer.workingHours.start.split(':')[0]);
+			const tEnd = parseInt(trainer.workingHours.end.split(':')[0]); // e.g., 17 means 5pm
+
+			if (startHour < tStart || startHour >= tEnd) {
+				return res.status(400).json({ success: false, message: `${trainer.name} is not working at this time (${trainer.workingHours.start} - ${trainer.workingHours.end})` });
+			}
+		}
+
+		// 2. Conflict Check
 		const existingBooking = await Booking.findOne({
-			machine: machineId,
+			trainers: { $in: trainerIds }, // Check if ANY of these trainers are booked
 			$or: [
 				{ startTime: { $lt: endTime, $gte: startTime } },
 				{ endTime: { $gt: startTime, $lte: endTime } },
@@ -24,12 +50,12 @@ export async function createReservation(req, res) {
 		});
 
 		if (existingBooking) {
-			return res.status(400).json({ success: false, message: "Machine already reserved for this time." });
+			return res.status(400).json({ success: false, message: "One or more trainers are already booked for this time." });
 		}
 
 		const newBooking = new Booking({
 			user: req.user._id,
-			machine: machineId,
+			trainers: trainerIds,
 			startTime,
 			endTime,
 		});
@@ -37,6 +63,7 @@ export async function createReservation(req, res) {
 		await newBooking.save();
 		res.status(201).json({ success: true, booking: newBooking });
 	} catch (error) {
+		console.log("Error in createReservation", error.message)
 		res.status(500).json({ success: false, message: "Server Error" });
 	}
 }
@@ -92,7 +119,7 @@ export async function getLiveBookings(req, res) {
 	try {
 		const bookings = await Booking.find({})
 			.populate('user', 'username email')
-			.populate('machine', 'name category')
+			.populate('trainers', 'name specialization')
 			.sort({ startTime: -1 });
 
 		res.status(200).json({ success: true, bookings });

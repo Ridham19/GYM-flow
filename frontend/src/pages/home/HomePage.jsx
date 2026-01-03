@@ -6,7 +6,7 @@ const HomePage = () => {
 		<div className='min-h-screen flex flex-col relative overflow-x-hidden'>
 			{/* Hero Section */}
 			<main className='relative z-10 flex flex-col items-center justify-center pt-32 pb-20 px-6 text-center animate-in fade-in zoom-in duration-700 min-h-[90vh]'>
-				<div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-1.5 rounded-full text-sm text-muted-foreground mb-8 backdrop-blur-sm">
+				<div className="inline-flex items-center gap-2 bg-accent/20 border border-border px-4 py-1.5 rounded-full text-sm text-muted-foreground mb-8 backdrop-blur-sm">
 					<Zap size={14} className="text-yellow-500" />
 					<span>The #1 Gym Management Tool</span>
 				</div>
@@ -30,7 +30,7 @@ const HomePage = () => {
 					>
 						Get Started Now <ArrowRight size={20} />
 					</Link>
-					<a href="#features" className='px-10 py-4 rounded-full font-bold text-lg flex items-center gap-2 transition-all hover:bg-white/5 border border-white/10'>
+					<a href="#features" className='px-10 py-4 rounded-full font-bold text-lg flex items-center gap-2 transition-all hover:bg-accent/20 border border-border text-foreground'>
 						Learn More
 					</a>
 				</div>
@@ -51,7 +51,7 @@ const HomePage = () => {
 							{ icon: <Zap className="text-orange-500" size={32} />, title: "Live Availability", desc: "See exactly what's free before you even leave your house." },
 						].map((f, i) => (
 							<div key={i} className="glass-panel p-8 rounded-3xl text-left hover:border-primary/50 transition-all duration-300 hover:-translate-y-2 group cursor-default">
-								<div className="mb-4 bg-white/5 w-12 h-12 flex items-center justify-center rounded-xl group-hover:bg-primary/10 transition-colors">
+								<div className="mb-4 bg-accent/20 w-12 h-12 flex items-center justify-center rounded-xl group-hover:bg-primary/10 transition-colors">
 									{f.icon}
 								</div>
 								<h3 className="font-bold text-xl mb-2">{f.title}</h3>
@@ -63,7 +63,7 @@ const HomePage = () => {
 			</section>
 
 			{/* Stats/About Section */}
-			<section className="py-24 border-y border-white/5 bg-white/[0.02]">
+			<section className="py-24 border-y border-border bg-accent/5">
 				<div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
 					<div>
 						<h2 className="text-3xl md:text-5xl font-black mb-6">Built for Serious Lifters</h2>

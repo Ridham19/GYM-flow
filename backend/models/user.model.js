@@ -5,7 +5,8 @@ const userSchema = mongoose.Schema({
 	username: { type: String, required: true, unique: true },
 	email: { type: String, required: true, unique: true },
 	password: { type: String, required: true },
-	isAdmin: { type: Boolean, default: false }, // New field
+	role: { type: String, enum: ["user", "admin", "trainer"], default: "user" },
+	isAdmin: { type: Boolean, default: false }, // Kept for backward compatibility, sync with role
 });
 
 export const User = mongoose.model("User", userSchema);

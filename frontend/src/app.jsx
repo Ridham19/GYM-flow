@@ -4,14 +4,37 @@ import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 import Dashboard from "./pages/Dashboard";
 import { useAuthStore } from "./store/authUser";
+import { useThemeStore } from "./store/themeStore";
 import AdminPage from "./pages/AdminPage";
 import Navbar from "./components/Navbar";
+import { useEffect } from "react";
 
 function App() {
-	const { user } = useAuthStore();
+	const { user, authCheck, isCheckingAuth } = useAuthStore();
+	const { theme } = useThemeStore();
+
+	useEffect(() => {
+		authCheck();
+	}, [authCheck]);
+
+	useEffect(() => {
+		if (theme === "dark") {
+			document.documentElement.classList.add("dark");
+		} else {
+			document.documentElement.classList.remove("dark");
+		}
+	}, [theme]);
+
+	if (isCheckingAuth) {
+		return (
+			<div className="h-screen w-full flex items-center justify-center bg-background">
+				<div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+			</div>
+		);
+	}
 
 	return (
-		<div className="min-h-screen bg-background text-foreground relative overflow-hidden selection:bg-primary selection:text-white">
+		<div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-white">
 			{/* Liquid Background Effects */}
 			<div className="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
 				<div className="liquid-bg-shape bg-purple-500 w-72 h-72 top-[-10%] left-[20%] mix-blend-multiply filter blur-xl opacity-20 animation-delay-2000"></div>
