@@ -9,8 +9,10 @@ import path from "path";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 
-
 const app = express();
+app.set('trust proxy', 1); // Add this line here
+
+// const app = express();
 const PORT = ENV_VARS.PORT;
 
 app.use(express.json()); // allows us to parse req.body
