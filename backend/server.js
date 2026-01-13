@@ -50,18 +50,26 @@ const seedMachines = async () => {
     }
 };
 
-const __dirname = path.resolve();
 
-if (ENV_VARS.NODE_ENV === "production") {
-    // Serve the static files from the frontend/dist folder
-    app.use(express.static(path.join(__dirname, "/frontend/dist")));
+import path from "path";
+import { fileURLToPath } from "url";
 
-    // For any other route, serve the index.html file
+// Fix for __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Move up one level to root, then into frontend/dist
+const buildPath = path.join(__dirname, "../frontend/dist");
+
+if (process.env.NODE_ENV === "production") {
+    // Serve static files from the frontend build folder
+    app.use(express.static(buildPath));
+
+    // For any other route, send the index.html file
     app.get("*", (req, res) => {
-        res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+        res.sendFile(path.join(buildPath, "index.html"));
     });
 } else {
-    // Basic route for development if you hit port 5000 directly
     app.get("/", (req, res) => {
         res.send("Server is running... Please use the Frontend Dev Server (port 5173)");
     });
