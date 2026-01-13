@@ -1,6 +1,90 @@
 import { Machine } from "../models/machine.model.js";
 import { Booking } from "../models/booking.model.js";
 import { Trainer } from "../models/trainer.model.js";
+import { User } from "../models/user.model.js";
+
+export async function getMyBookings(req, res) {
+	try {
+		const bookings = await Booking.find({ user: req.user._id })
+			.populate('trainers', 'name specialization')
+			.sort({ startTime: 1 });
+		res.status(200).json({ success: true, bookings });
+	} catch (error) {
+		console.log("Error in getMyBookings", error.message);
+		res.status(500).json({ success: false, message: "Server Error" });
+	}
+}
+
+export async function cancelBooking(req, res) {
+	try {
+		const { id } = req.params;
+		const booking = await Booking.findById(id);
+
+		if (!booking) {
+			return res.status(404).json({ success: false, message: "Booking not found" });
+		}
+
+		if (booking.user.toString() !== req.user._id.toString()) {
+			return res.status(403).json({ success: false, message: "Unauthorized to cancel this booking" });
+		}
+
+		await Booking.findByIdAndDelete(id);
+		res.status(200).json({ success: true, message: "Booking cancelled successfully" });
+	} catch (error) {
+		console.log("Error in cancelBooking", error.message);
+		res.status(500).json({ success: false, message: "Server Error" });
+	}
+}
+
+export async function getUserManagement(req, res) {
+	try {
+		const users = await User.find({ role: { $ne: 'admin' } }).select("-password");
+		res.status(200).json({ success: true, users });
+	} catch (error) {
+		console.log("Error in getUserManagement", error.message);
+		res.status(500).json({ success: false, message: "Server Error" });
+	}
+}
+
+export async function approveUser(req, res) {
+	try {
+		const { id } = req.params;
+		await User.findByIdAndUpdate(id, { isApproved: true });
+		res.status(200).json({ success: true, message: "User approved successfully" });
+	} catch (error) {
+		console.log("Error in approveUser", error.message);
+		res.status(500).json({ success: false, message: "Server Error" });
+	}
+}
+
+export async function updatePayment(req, res) {
+	try {
+		const { id } = req.params;
+		const { action, days } = req.body; // action: 'renew' | 'cancel'
+
+		if (action === 'cancel') {
+			await User.findByIdAndUpdate(id, {
+				paymentStatus: 'cancelled',
+				nextPaymentDate: null
+			});
+			return res.status(200).json({ success: true, message: "Membership cancelled" });
+		}
+
+		// Default to renew if no action or action is renew
+		const renewalDays = days ? parseInt(days) : 30;
+		const nextDate = new Date();
+		nextDate.setDate(nextDate.getDate() + renewalDays);
+
+		await User.findByIdAndUpdate(id, {
+			paymentStatus: 'active',
+			nextPaymentDate: nextDate
+		});
+		res.status(200).json({ success: true, message: `Membership renewed for ${renewalDays} days` });
+	} catch (error) {
+		console.log("Error in updatePayment", error.message);
+		res.status(500).json({ success: false, message: "Server Error" });
+	}
+}
 
 export async function getMachines(req, res) {
 	try {
@@ -22,13 +106,19 @@ export async function createReservation(req, res) {
 
 		const start = new Date(startTime);
 		const end = new Date(endTime);
+
+		// Duration check (limit to 2 hours)
+		const durationHours = (end - start) / (1000 * 60 * 60);
+		if (durationHours > 2) {
+			return res.status(400).json({ success: false, message: "Reservation cannot exceed 2 hours" });
+		}
+		if (durationHours <= 0) {
+			return res.status(400).json({ success: false, message: "Invalid time range" });
+		}
+
 		const startHour = start.getHours();
 
 		// 1. Validate Working Hours for ALL selected trainers
-		// We need to fetch trainers first to check their specific working hours
-		// For simplicity/performance, assume we might need to do a DB call here or just check basic range constraint if generic.
-		// But user requirement: "time user selects should be in the trainers working hour"
-		// Detailed check:
 		const trainers = await Trainer.find({ _id: { $in: trainerIds } });
 
 		for (const trainer of trainers) {
@@ -41,12 +131,11 @@ export async function createReservation(req, res) {
 		}
 
 		// 2. Conflict Check
+		// Standard Overlap: (StartA < EndB) && (EndA > StartB)
 		const existingBooking = await Booking.findOne({
-			trainers: { $in: trainerIds }, // Check if ANY of these trainers are booked
-			$or: [
-				{ startTime: { $lt: endTime, $gte: startTime } },
-				{ endTime: { $gt: startTime, $lte: endTime } },
-			],
+			trainers: { $in: trainerIds },
+			startTime: { $lt: endTime },
+			endTime: { $gt: startTime }
 		});
 
 		if (existingBooking) {

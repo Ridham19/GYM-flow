@@ -6,12 +6,22 @@ import authRoutes from "./routes/auth.route.js";
 import gymRoutes from "./routes/gym.route.js";
 import trainerRoutes from "./routes/trainer.route.js";
 import path from "path";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 
 
 const app = express();
 const PORT = ENV_VARS.PORT;
 
 app.use(express.json()); // allows us to parse req.body
+app.use(helmet());
+
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    message: "Too many requests from this IP, please try again after 15 minutes",
+});
+app.use(limiter);
 app.use(cookieParser());
 app.use("/api/v1/gym", gymRoutes);
 app.use("/api/v1/trainers", trainerRoutes);

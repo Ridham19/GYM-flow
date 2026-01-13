@@ -1,23 +1,30 @@
 import bcryptjs from "bcryptjs";
 import { User } from "../models/user.model.js";
 import { generateTokenAndSetCookie } from "../utils/generateToken.js";
+import { z } from "zod";
+
+const signupSchema = z.object({
+	username: z.string().min(1, "Username is required"),
+	email: z.string().email("Invalid email format"),
+	password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+const loginSchema = z.object({
+	email: z.string().email("Invalid email format"),
+	password: z.string().min(1, "Password is required"),
+});
 
 export async function signup(req, res) {
 	try {
+		const validation = signupSchema.safeParse(req.body);
+		if (!validation.success) {
+			return res.status(400).json({
+				success: false,
+				message: validation.error.errors[0].message
+			});
+		}
+
 		const { email, password, username } = req.body;
-
-		if (!email || !password || !username) {
-			return res.status(400).json({ success: false, message: "All fields are required" });
-		}
-
-		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		if (!emailRegex.test(email)) {
-			return res.status(400).json({ success: false, message: "Invalid email" });
-		}
-
-		if (password.length < 6) {
-			return res.status(400).json({ success: false, message: "Password must be at least 6 characters" });
-		}
 
 		const existingUserByEmail = await User.findOne({ email: email });
 		if (existingUserByEmail) {
@@ -36,13 +43,15 @@ export async function signup(req, res) {
 			email,
 			password: hashedPassword,
 			username,
+			// isApproved default false
 		});
 
-		generateTokenAndSetCookie(newUser._id, res);
 		await newUser.save();
 
+		// Do NOT log them in. Return message.
 		res.status(201).json({
 			success: true,
+			message: "Account created successfully. Please wait for admin approval.",
 			user: {
 				...newUser._doc,
 				password: "",
@@ -50,17 +59,21 @@ export async function signup(req, res) {
 		});
 	} catch (error) {
 		console.log("Error in signup controller", error.message);
-		res.status(500).json({ success: false, message: "Internal server error" });
+		res.status(500).json({ success: false, message: error.message });
 	}
 }
 
 export async function login(req, res) {
 	try {
-		const { email, password } = req.body;
-
-		if (!email || !password) {
-			return res.status(400).json({ success: false, message: "All fields are required" });
+		const validation = loginSchema.safeParse(req.body);
+		if (!validation.success) {
+			return res.status(400).json({
+				success: false,
+				message: validation.error.errors[0].message
+			});
 		}
+
+		const { email, password } = req.body;
 
 		const user = await User.findOne({ email: email });
 		if (!user) {
@@ -71,6 +84,12 @@ export async function login(req, res) {
 
 		if (!isPasswordCorrect) {
 			return res.status(400).json({ success: false, message: "Invalid credentials" });
+		}
+
+		// Treat undefined/null as true (approved) for legacy users
+		// Admins are always approved
+		if (user.role !== 'admin' && user.isApproved === false) {
+			return res.status(403).json({ success: false, message: "Your account is pending approval from the admin." });
 		}
 
 		generateTokenAndSetCookie(user._id, res);

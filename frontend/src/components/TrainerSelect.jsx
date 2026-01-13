@@ -4,7 +4,7 @@ const TrainerSelect = ({ trainers, selectedId, onChange }) => {
     return (
         <div className="space-y-2">
             <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest ml-1">Select Trainer</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-1 custom-scrollbar">
                 {trainers.map(trainer => {
                     const isSelected = selectedId === trainer._id;
                     return (

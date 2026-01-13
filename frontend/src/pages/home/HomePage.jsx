@@ -11,7 +11,7 @@ const HomePage = () => {
 					<span>The #1 Gym Management Tool</span>
 				</div>
 
-				<h1 className='text-6xl md:text-8xl font-black mb-8 tracking-tighter leading-none'>
+				<h1 className='text-4xl md:text-8xl font-black mb-8 tracking-tighter leading-none'>
 					WORKOUT <br />
 					<span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-blue-500 to-purple-600 animate-gradient">
 						WITHOUT WAITING.
@@ -82,7 +82,7 @@ const HomePage = () => {
 							))}
 						</ul>
 					</div>
-					<div className="grid grid-cols-2 gap-4">
+					<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 						<div className="glass-panel p-6 rounded-2xl text-center">
 							<div className="text-4xl font-black text-primary mb-1">2k+</div>
 							<div className="text-sm text-muted-foreground uppercase font-bold tracking-wider">Members</div>

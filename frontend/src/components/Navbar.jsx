@@ -11,7 +11,7 @@ const Navbar = () => {
     const toggleMenu = () => setIsOpen(!isOpen);
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/40">
+        <header className="fixed top-0 left-0 right-0 z-[100] glass border-b border-border/40">
             <nav className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
                 {/* Logo */}
                 <Link to="/" className="flex items-center gap-2 group">
@@ -106,7 +106,7 @@ const Navbar = () => {
 
             {/* Mobile Menu */}
             {isOpen && (
-                <div className="md:hidden absolute top-16 left-0 right-0 bg-background/95 backdrop-blur-lg border-b border-border p-6 space-y-4 animate-in slide-in-from-top-2 shadow-xl z-40">
+                <div className="md:hidden absolute top-16 left-0 right-0 bg-background/95 backdrop-blur-lg border-b border-border p-6 space-y-4 animate-in slide-in-from-top-2 shadow-xl z-[60]">
                     <Link to="/" onClick={() => setIsOpen(false)} className="block text-muted-foreground hover:text-foreground">
                         Home
                     </Link>
